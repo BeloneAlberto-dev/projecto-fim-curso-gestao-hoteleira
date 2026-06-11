@@ -57,7 +57,7 @@ hotel/
 1. Clone o repositório:
 
 ```bash
-git clone 
+git clone https://github.com/BeloneAlberto-dev/projecto-fim-curso-gestao-hoteleira.git
 ```
 
 2. Copie a pasta do projeto para:
