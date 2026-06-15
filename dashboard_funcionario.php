@@ -16,8 +16,12 @@ $sql = "SELECT reservas.*, users.name, users.email
         JOIN users ON reservas.id_client = users.id_client
         ORDER BY reservas.data_reserva DESC";
 $result = $conn->query($sql);
+$sqlAdm = "SELECT adm.*, users.name AS reservador
+           FROM adm
+           JOIN users ON adm.id_client = users.id_client
+           ORDER BY adm.data_reserva DESC";
 
-$adm_result = $conn->query("SELECT * FROM adm ORDER BY data_reserva DESC");
+$adm_result = $conn->query($sqlAdm);
 ?>
 
 <!DOCTYPE html>
@@ -283,7 +287,7 @@ tr:hover{
 
 <!-- RESERVAS -->
 <section id="reservas" class="dashboard-section">
-<h2>Reservas</h2>
+<h2>Reservas Users</h2>
 
 <a href="add_reserva.php" class="add-btn">
 <i class="fa-solid fa-calendar-plus"></i> Nova Reserva
@@ -294,7 +298,7 @@ tr:hover{
        placeholder="Pesquisar reserva por nome ou tipo..."
        onkeyup="filterTable('searchReservas','reservasTable')">
 <table id="reservasTable">
-<tr><th>Data-Reserva</th><th>Nome</th><th>Email</th><th>Tipo</th><th>Entrada</th><th>Saída</th><th>Status</th><th>Ações</th></tr>
+<tr><th>Data-Reserva</th><th>Nome do cliente</th><th>Email</th><th>Tipo</th><th>Entrada</th><th>Saída</th><th>Status</th><th>Ações</th></tr>
 <?php while($row = $result->fetch_assoc()): ?>
 <tr>
 <td><?= $row['data_reserva'] ?></td>
@@ -315,17 +319,18 @@ tr:hover{
 
 <br><br>
 
-<h2>Reservas Admin</h2>
+<h2>Reservas  feitas por Admin ou funcionário</h2>
 <input type="text" 
        class="search-box" 
        id="searchAdm" 
        placeholder="Pesquisar reserva admin..."
        onkeyup="filterTable('searchAdm','admTable')">
 <table id="admTable">
-<tr><th>Data-Reserva</th><th>Nome</th><th>Email</th><th>Tipo</th><th>Entrada</th><th>Saída</th><th>Status</th><th>Ações</th></tr>
+<tr><th>Data-Reserva</th><th>Reserva feita por</th><th>Nome do hóspede</th><th>Email</th><th>Tipo</th><th>Entrada</th><th>Saída</th><th>Status</th><th>Ações</th></tr>
 <?php while($adm = $adm_result->fetch_assoc()): ?>
 <tr>
 <td><?= $adm['data_reserva'] ?></td>
+<td><?= $adm['reservador'] ?></td>
 <td><?= $adm['name'] ?></td>
 <td><?= $adm['email'] ?></td>
 <td><?= $adm['tipo'] ?></td>

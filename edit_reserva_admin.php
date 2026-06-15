@@ -26,6 +26,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $saida = !empty($_POST['saida']) ? $_POST['saida'] : $reserva['saida'];
     $status = !empty($_POST['status']) ? $_POST['status'] : ($reserva['status'] ?? 'pendente');
 
+
     $sqlCheck = "SELECT tipo, entrada, saida FROM reservas 
              WHERE tipo = '$tipo'
              AND id_reserva != $id
@@ -237,3 +238,4 @@ button:hover {
 
 </body>
 </html>
+

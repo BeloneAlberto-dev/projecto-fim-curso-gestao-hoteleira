@@ -11,7 +11,8 @@ if(
 include 'db.php';  
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+    $name = $_POST['name'];
+    $email = $_POST['email'];
     $tipo = $_POST['tipo'];
     $entrada = $_POST['entrada'];
     $saida = $_POST['saida'];
@@ -46,18 +47,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $id_client = $_SESSION['user_id'];
 
-            $sql = "INSERT INTO reservas 
-                    (id_client, tipo, entrada, saida, data_reserva)
+            $sql = "INSERT INTO adm 
+                    (id_client, name, email, tipo, entrada, saida, data_reserva)
                     VALUES 
-                    ('$id_client', '$tipo', '$entrada', '$saida', NOW())";
+                    ('$id_client','$name', '$email', '$tipo', '$entrada', '$saida', NOW())";
 
             if ($conn->query($sql) === TRUE) {
-                $_SESSION['success'] = "Check-in realizado com sucesso!";
-                header("Location: usuario_logado.php");
-                exit();
+
+            if ($_SESSION['user_role'] == 'admin') {
+                header("Location: dashboard_admin.php");
             } else {
-                $error = "Erro ao registrar reserva: " . $conn->error;
+                header("Location: dashboard_funcionario.php");
             }
+            exit();
+
+        } else {
+            $error = "Erro: " . $conn->error;
+        }
         }
     }
 }

@@ -13,48 +13,70 @@ $result = $conn->query("SELECT * FROM reservas WHERE id_reserva=$id");
 $reserva = $result->fetch_assoc();
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-$tipo = !empty($_POST['tipo']) ? $_POST['tipo'] : $reserva['tipo'];
-$entrada = !empty($_POST['entrada']) ? $_POST['entrada'] : $reserva['entrada'];
-$saida = !empty($_POST['saida']) ? $_POST['saida'] : $reserva['saida'];
 
-$sqlCheck1 = "SELECT * FROM adm 
-              WHERE tipo = '$tipo'
-              AND id_reserva != $id
-              AND (
-                ('$entrada' BETWEEN entrada AND saida)
-                OR ('$saida' BETWEEN entrada AND saida)
-                OR (entrada BETWEEN '$entrada' AND '$saida')
-              )";
+    $tipo = !empty($_POST['tipo']) ? $_POST['tipo'] : $reserva['tipo'];
+    $entrada = !empty($_POST['entrada']) ? $_POST['entrada'] : $reserva['entrada'];
+    $saida = !empty($_POST['saida']) ? $_POST['saida'] : $reserva['saida'];
 
-$sqlCheck2 = "SELECT * FROM reservas 
-              WHERE tipo = '$tipo'
-              AND id_reserva != $id
-              AND (
-                ('$entrada' BETWEEN entrada AND saida)
-                OR ('$saida' BETWEEN entrada AND saida)
-                OR (entrada BETWEEN '$entrada' AND '$saida')
-              )";
+    // Verificar datas
+    if (strtotime($saida) <= strtotime($entrada)) {
 
-$check1 = $conn->query($sqlCheck1);
-$check2 = $conn->query($sqlCheck2);
+        $error = "A data de saída deve ser maior que a data de entrada.";
 
-if (($check1 && $check1->num_rows > 0) || ($check2 && $check2->num_rows > 0)) {
-    $error = "Data já ocupada para este quarto";
-} else {
+    } else {
 
- $sql = "UPDATE reservas 
-            SET tipo='$tipo', entrada='$entrada', saida='$saida', data_reserva=NOW()
-            WHERE id_reserva=$id  AND status = 'pendente'";
+        $sqlCheck1 = "SELECT * FROM adm 
+                      WHERE tipo = '$tipo'
+                      AND id_reserva != $id
+                      AND (
+                        ('$entrada' BETWEEN entrada AND saida)
+                        OR ('$saida' BETWEEN entrada AND saida)
+                        OR (entrada BETWEEN '$entrada' AND '$saida')
+                      )";
 
-        if ($conn->query($sql) === TRUE) {
-           header("Location: usuario_logado.php");
-           exit();
+        $sqlCheck2 = "SELECT * FROM reservas 
+                      WHERE tipo = '$tipo'
+                      AND id_reserva != $id
+                      AND (
+                        ('$entrada' BETWEEN entrada AND saida)
+                        OR ('$saida' BETWEEN entrada AND saida)
+                        OR (entrada BETWEEN '$entrada' AND '$saida')
+                      )";
+
+        $check1 = $conn->query($sqlCheck1);
+        $check2 = $conn->query($sqlCheck2);
+
+        if (($check1 && $check1->num_rows > 0) || ($check2 && $check2->num_rows > 0)) {
+
+            $error = "Data já ocupada para este quarto";
+
         } else {
-            $error = "Erro ao registrar reserva: " . $conn->error;
+
+            $sql = "UPDATE reservas 
+                    SET tipo='$tipo',
+                        entrada='$entrada',
+                        saida='$saida',
+                        data_reserva=NOW()
+                    WHERE id_reserva=$id
+                    AND status='pendente'";
+
+            if ($conn->query($sql) === TRUE) {
+
+                if ($conn->affected_rows > 0) {
+                    header("Location: usuario_logado.php?msg=editada#reservas");
+                } else {
+                    header("Location: usuario_logado.php?erro=nao_pendente#reservas");
+                }
+                exit();
+
+            } else {
+
+                $error = "Erro ao editar reserva: " . $conn->error;
+
+            }
         }
     }
 }
-
 //buscar tipos de quartos
 $rooms_sql = "SELECT * FROM rooms "; 
 $rooms_result = $conn->query($rooms_sql); 

@@ -176,8 +176,30 @@ if(isset($_SESSION['success'])) {
             <h2 class="section-title">Minhas Reservas</h2>
             <div class="section-content">
                 <table>
-          <?php 
-if(isset($error2)) echo "<p style='color:red; text-align:center;'>$error</p>";?>              
+<?php
+if (isset($_GET['erro']) && $_GET['erro'] == 'estado_invalido') {
+    echo "<div style='color:red; text-align:center;'>
+            Só é possível apagar reservas com estado Pendente.
+          </div>";
+}
+
+if (isset($_GET['msg']) && $_GET['msg'] == 'apagada') {
+    echo "<div style='color:green;  text-align:center;'>
+            Reserva apagada com sucesso.
+          </div>";
+}
+
+if (isset($_GET['erro']) && $_GET['erro'] == 'nao_pendente') {
+    echo "<div style='color:red;  text-align:center;'>
+            Só é possível editar reservas pendentes.
+          </div>";
+}
+if (isset($_GET['msg']) && $_GET['msg'] == 'editada') {
+    echo "<div style='color:green;  text-align:center;'>
+            Reserva editada com sucesso.
+          </div>";
+}
+?>
     <tr>
         <th>Tipo</th>
         <th>Entrada</th>

@@ -24,11 +24,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $sql = "INSERT INTO rooms (tipo, descricao, preco, imagem)
             VALUES ('$tipo', '$descricao', '$preco', '$imagem')";
 
-    if($conn->query($sql)){
-         $_SESSION['success'] = "Quarto adicionado com sucesso!";
-        header("Location: add_room.php");
-       exit();
-    }
+      if ($conn->query($sql) === TRUE) {
+
+            if ($_SESSION['user_role'] == 'admin') {
+                header("Location: dashboard_admin.php");
+            } else {
+                header("Location: dashboard_funcionario.php");
+            }
+            exit();
+
+        } else {
+            $error = "Erro: " . $conn->error;
+        }
 }
 
 ?>
